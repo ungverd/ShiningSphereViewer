@@ -4,6 +4,7 @@ import csv
 import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from loguru import logger
 
 import design
 
@@ -20,6 +21,7 @@ ROW = int('0x18', 16)
 PAUSE = int('0x36', 16)
 START = int('0x22', 16)
 STOP = int('0x23', 16)
+INFINITE = int('0xff', 16)
 
 class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
@@ -66,13 +68,15 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
             for j in range(self.returned + 1, len(self.rules)):
                 rule = self.rules[j]
                 if self.i == rule[1]:
-                    if rule[2] == 'pause':
-                        counter = rule[0]
-                        while counter > 0:
-                            counter -= 1
-                            yield
-                    else:
-                        self.stack.append(rule[:] + [j])
+                    self.stack.append(rule[:] + [j])
+
+            if self.frames[self.i][1] == 'pause':
+                counter = self.frames[self.i][0]
+                while counter > 0:
+                    counter -= 1
+                    yield #pause here
+            else:
+                yield #draw frame here
 
 
             while self.stack and self.i == self.stack[-1][2]:
@@ -86,24 +90,23 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
             self.i += 1
             
-
-            '''if self.i >= len(self.frames):
-                print('end')'''
-            
             if self.i >= len(self.frames):
                 self.re_null()
                 if not self.round:
                     self.stop()
-            yield
+                    yield 'stop'
 
 
     def update_img(self):
-        self.draw_frame(self.frames[self.i])
 
         #update i
-        next(self.upd_gen)
+        if next(self.upd_gen) != 'stop':
+            self.draw_frame(self.frames[self.i])
 
     def draw_frame(self, frame):
+        if frame[1] == 'pause':
+            return
+
         for i in range(HEIGHT):
             for j in range(WIDTH):
                 if COLORS[i][j]:
@@ -178,14 +181,14 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
                 elif values[i] == PAUSE:
                     pause_len = values[i+1]
 
-                    if pause_len == 0:
+                    if pause_len == INFINITE:
                         pause_len = -1
-                    rules.append([pause_len, len(frames)-1, 'pause'])
+                    frames.append([pause_len, 'pause'])
                     i += 2
 
                 elif values[i] == START:
                     reps = values[i+1]
-                    if reps == 0:
+                    if reps == INFINITE:
                         reps = -1
                     rules.append([reps, len(frames)])
                     i += 2
@@ -199,14 +202,49 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
                             appended = True
                         else:
                             j -= 1
+                            if j < 0:
+                                raise Exception('there is more "close cycle" commands then "open cycle" or some cycles are closed before opened')
                     i += 1
                 else:
                     raise Exception('incorrect input file')
+        for rule in rules:
+            if len(rule) == 2:
+                raise Exception('source file contains cycles that are not closed properly')
+
         self.frames = frames
         self.rules = rules
 
+def setup_exception_logging():
+    # generating our hook
+    # Back up the reference to the exceptionhook
+    sys._excepthook = sys.excepthook
 
-app = QtWidgets.QApplication(sys.argv)
-window = SphereUi()
-window.show()
-app.exec_()
+    def my_exception_hook(exctype, value, traceback):
+        # Print the error and traceback
+        logger.exception(f"{exctype}, {value}, {traceback}")
+        # Call the normal Exception hook after
+        sys._excepthook(exctype, value, traceback)
+        # sys.exit(1)
+
+    # Set the exception hook to our wrapping function
+    sys.excepthook = my_exception_hook
+
+
+def resource_path(relative):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative)
+    else:
+        return os.path.join(os.path.abspath("."), relative)
+
+
+@logger.catch
+def main():
+    setup_exception_logging()
+    app = QtWidgets.QApplication(sys.argv)
+    window = SphereUi()
+    window.show()
+    app.exec_()
+
+
+if __name__ == '__main__':
+    main()
