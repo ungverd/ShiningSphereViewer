@@ -12,16 +12,19 @@ _translate = QtCore.QCoreApplication.translate
 
 FILENAME = 'effect.h'
 WIDTH = 9
-HEIGHT = 5
+HEIGHT = 7
+ADD_H = 2
+OLD_H = HEIGHT - ADD_H
 ROW_LENGTH = WIDTH * HEIGHT
 BLUES = [2, 5, 13, 16, 22, 29, 31, 35, 43]
-COLORS = [[(HEIGHT*j+i) in BLUES for j in range(WIDTH)] for i in range(HEIGHT)]
+COLORS = [[(OLD_H*j+i) in BLUES for j in range(WIDTH)] for i in range(OLD_H)] + ADD_H * [[False] * WIDTH]
 
 ROW = int('0x18', 16)
 PAUSE = int('0x36', 16)
 START = int('0x22', 16)
 STOP = int('0x23', 16)
 INFINITE = int('0xff', 16)
+ENDFILE = int('0xf1', 16)
 
 class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
@@ -108,10 +111,12 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
             return
 
         for i in range(HEIGHT):
-            for j in range(WIDTH):
-                if COLORS[i][j]:
+            for j in range(WIDTH): #white
+                if HEIGHT - i <= ADD_H:
+                    color = (frame[i][j], frame[i][j], frame[i][j])
+                elif COLORS[i][j]: #blue
                     color = (0, 0, frame[i][j])
-                else:
+                else: #green
                     color = (0, frame[i][j], 0)
                 color_strs = tuple(("0" + hex(c)[2:])[-2:] for c in color)
                 cell = getattr(self, "label%d_%d" % (i, j))
@@ -167,15 +172,7 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
             while i < len(values):
                 if values[i] == ROW:
                     row = values[i + 1 : i + ROW_LENGTH + 1]
-                    greens = (x for x in row[:-len(BLUES):])
-                    blues = (x for x in row[-len(BLUES)::])
-                    line = []
-                    for j in range(ROW_LENGTH):
-                        if j in BLUES:
-                            line.append(next(blues))
-                        else:
-                            line.append(next(greens))
-                    frame = [line[j::HEIGHT] for j in range(HEIGHT)]
+                    frame = [row[j::HEIGHT] for j in range(HEIGHT)]
                     frames.append(frame)
                     i += (ROW_LENGTH + 1)
                 elif values[i] == PAUSE:
@@ -205,8 +202,10 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
                             if j < 0:
                                 raise Exception('there is more "close cycle" commands then "open cycle" or some cycles are closed before opened')
                     i += 1
+                elif values[i] == ENDFILE:
+                    i = len(values) #end
                 else:
-                    raise Exception('incorrect input file')
+                    raise Exception('incorrect input file, value %x in place %d' % (values[i], i))
         for rule in rules:
             if len(rule) == 2:
                 raise Exception('source file contains cycles that are not closed properly')
