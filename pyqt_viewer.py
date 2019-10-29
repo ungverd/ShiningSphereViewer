@@ -10,7 +10,6 @@ import design
 
 _translate = QtCore.QCoreApplication.translate
 
-FILENAME = 'effect.h'
 WIDTH = 9
 HEIGHT = 7
 ADD_H = 2
@@ -31,6 +30,7 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.fname = 'effect.h'
 
         self.round = False
         self.stopped = False
@@ -42,9 +42,17 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.RoundCheckBox.stateChanged.connect(self.change_round)
         self.StartStopButton.clicked.connect(self.startstop)
         self.ReloadButton.clicked.connect(self.reload)
+        self.openFileButton.clicked.connect(self.openFile)
 
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update_img)
+        self.reload()
+
+    def openFile(self):
+        self.fname = QtWidgets.QFileDialog.getOpenFileName(self,
+                                                           'Open file', 
+                                                           os.path.dirname(os.path.abspath(__file__)),
+                                                           '*.h')[0]
         self.reload()
 
     def reload(self):
@@ -141,7 +149,7 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
     def get_frames(self):
         frames = []
         rules = []
-        with open (FILENAME, newline='', mode='r') as f:
+        with open (self.fname, newline='', mode='r') as f:
 
             from_file_started = False
             from_file_stopped = False

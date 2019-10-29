@@ -856,6 +856,15 @@
         <property name="text">
          <string>по кругу</string>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
       <item>
@@ -866,9 +875,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="openFileButton">
+        <property name="text">
+         <string>Выбрать файл</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="ReloadButton">
         <property name="text">
-         <string>перезагрузить файл</string>
+         <string>Перезагрузить файл</string>
         </property>
        </widget>
       </item>
