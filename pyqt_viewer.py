@@ -93,7 +93,7 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
             while self.stack and self.i == self.stack[-1][2]:
                 self.stack[-1][0] -= 1
                 if self.stack[-1][0] == 0:
-                    self.stack = self.stack[:-1]
+                    self.stack.pop()
                 else:
                     self.i = self.stack[-1][1] - 1
                     self.returned = self.stack[-1][3]
@@ -170,7 +170,10 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
                             s += line[start:]
                         stop = -1
                         start = 0
-            values = [int(v.strip(), 16) for v in s.split(',')]
+            values = [v.strip() for v in s.split(',')]
+            if values[-1] == '':
+                values.pop()
+            values = [int(v, 16) for v in values]
 
 
             i = 0
