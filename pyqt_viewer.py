@@ -211,7 +211,8 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
                         else:
                             j -= 1
                             if j < 0:
-                                raise Exception('there is more "close cycle" commands then "open cycle" or some cycles are closed before opened')
+                                print('WARNING: there is more "close cycle" commands then "open cycle" or some cycles are closed before opened')
+                                appended = True
                     i += 1
                 elif values[i] == ENDFILE:
                     i = len(values) #end
