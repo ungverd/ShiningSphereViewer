@@ -32,7 +32,7 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.setupUi(self)
         self.fname = 'effect.h'
 
-        self.round = False
+        self.round = True
         self.stopped = False
         self.re_null()
 
