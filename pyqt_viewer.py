@@ -53,6 +53,7 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
                                                            'Open file', 
                                                            os.path.dirname(os.path.abspath(__file__)),
                                                            '*.h')[0]
+        self.label.setText(self.fname)
         self.reload()
 
     def reload(self):

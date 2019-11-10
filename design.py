@@ -29,6 +29,9 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.label = QtWidgets.QLabel(self.centralwidget)
+        self.label.setObjectName("label")
+        self.verticalLayout_2.addWidget(self.label)
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.gridLayout_2 = QtWidgets.QGridLayout()
@@ -429,6 +432,8 @@ class Ui_MainWindow(object):
         self.ReloadButton.setObjectName("ReloadButton")
         self.horizontalLayout.addWidget(self.ReloadButton)
         self.lcdNumber = QtWidgets.QLCDNumber(self.centralwidget)
+        self.lcdNumber.setDigitCount(2)
+        self.lcdNumber.setProperty("intValue", 25)
         self.lcdNumber.setObjectName("lcdNumber")
         self.horizontalLayout.addWidget(self.lcdNumber)
         self.verticalLayout_2.addLayout(self.horizontalLayout)
@@ -441,6 +446,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        self.label.setText(_translate("MainWindow", "effect.h"))
         self.RoundCheckBox.setText(_translate("MainWindow", "по кругу"))
         self.StartStopButton.setText(_translate("MainWindow", "Стоп"))
         self.openFileButton.setText(_translate("MainWindow", "Выбрать файл"))
