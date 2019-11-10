@@ -445,7 +445,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "EffectViewer"))
         self.label.setText(_translate("MainWindow", "effect.h"))
         self.RoundCheckBox.setText(_translate("MainWindow", "по кругу"))
         self.StartStopButton.setText(_translate("MainWindow", "Стоп"))

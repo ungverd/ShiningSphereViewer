@@ -16,7 +16,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>EffectViewer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="enabled">
