@@ -49,12 +49,17 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
         self.reload()
 
     def openFile(self):
+        prev_fname = self.fname
         self.fname = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                           'Open file', 
-                                                           os.path.dirname(os.path.abspath(__file__)),
-                                                           '*.h')[0]
-        self.label.setText(self.fname)
-        self.reload()
+                                                      'Open file', 
+                                                       os.path.dirname(os.path.abspath(__file__)),
+                                                       '*.h')[0]
+        try:
+            self.reload()
+            self.label.setText(self.fname)
+        except Exception as e:
+            self.fname = prev_fname
+            error_message(str(e))
 
     def reload(self):
         self.get_frames()
@@ -225,6 +230,20 @@ class SphereUi(QtWidgets.QMainWindow, design.Ui_MainWindow):
 
         self.frames = frames
         self.rules = rules
+
+def error_message(text):
+    """
+    shows error window with text
+    :param text: error text
+    :return:
+    """
+    error = QtWidgets.QMessageBox()
+    error.setIcon(QtWidgets.QMessageBox.Critical)
+    error.setText(text)
+    error.setWindowTitle('Ошибка открытия файла')
+    error.setStandardButtons(QtWidgets.QMessageBox.Ok)
+    error.exec_()
+
 
 def setup_exception_logging():
     # generating our hook
